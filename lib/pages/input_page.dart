@@ -1,8 +1,9 @@
+import 'package:bmi_calculator/pages/result_page.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'components/icon_contents.dart';
-import 'components/reusable_card.dart';
-import 'constants/constants.dart';
+import '../constants/constants.dart';
+import '../components/index.dart';
+import 'package:bmi_calculator/calculator.dart';
 
 class InputPage extends StatefulWidget {
   const InputPage({super.key});
@@ -15,7 +16,7 @@ enum Gender { male, female }
 
 class _InputPageState extends State<InputPage> {
   Gender selectedGender = Gender.male;
-  double height = 150;
+  int height = 150;
   int weight = 60;
   int age = 18;
 
@@ -98,10 +99,10 @@ class _InputPageState extends State<InputPage> {
                           child: Slider(
                             min: 100,
                             max: 220,
-                            value: height,
+                            value: height.toDouble(),
                             onChanged: (double value) {
                               setState(() {
-                                height = value.round().toDouble();
+                                height = value.toInt();
                               });
                             },
                           ),
@@ -216,11 +217,23 @@ class _InputPageState extends State<InputPage> {
               ],
             ),
           ),
-          Container(
-            color: Color(0xFFEB1555),
-            margin: EdgeInsets.only(top: 10),
-            width: double.infinity,
-            height: 70,
+          BottomButton(
+            title: "Calculate",
+            onTap: () {
+              Calculator calc =
+                  Calculator(height: height.toInt(), weight: weight);
+              final result = calc.getResult();
+
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => ResultsPage(
+                            resultText: result[ResultsKeys.state],
+                            color: result[ResultsKeys.color],
+                            bmiResult: calc.calculateBMI(),
+                            interpretation: result[ResultsKeys.message],
+                          )));
+            },
           ),
         ],
       ),
